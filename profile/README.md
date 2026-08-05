@@ -26,12 +26,7 @@ If you are new, start with the repositories below:
 - `ttswap-core` - core protocol contracts and market/token logic
 - `ttswap-doc` - technical whitepapers and protocol documentation
 - `ttswap-subgraph` - indexing and analytics data layer
-- `ttswap-frontend` - ttswap UI,
-
-For protocol understanding, start with:
-
-- Whitepaper: `ttswap-doc/index/v2相关文档/whitepaper.md`
-- Core entrypoints: `TTSwap_Market_Proxy` / `TTSwap_Token_Proxy`
+- `ttswap-frontend` - ttswap UI
 
 ## 🔗 Additional Resources
 
