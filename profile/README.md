@@ -1,62 +1,47 @@
-## TTSWAP
+## Hey hey, welcome to the TTSWAP GitHub 🔨
 
-### Overview
+The TTSWAP GitHub is where contributors build a wider on-chain liquidity and payment ecosystem together 🌍  
+We are an open-source-first community and we welcome contributions, feature requests, issues, and pull requests 💡
 
-TTSWAP (Token-Token Swap) is a decentralized market-making protocol (AMM) on EVM-compatible chains.
+We are excited to build with the web3 developer community - see you around!
 
-It introduces a Constant Value AMM (CV-AMM) with O(1) algebraic formulas that unify CPMM, weighted pools, and StableSwap behavior.
+## 🏖️ About TTSWAP
 
-It routes swaps through a Singleton market architecture instead of pair fragmentation.
+TTSWAP is a decentralized market-making and payment protocol built on EVM-compatible chains.
 
----
+At the core is the Constant Value AMM (CV-AMM), designed to unify CPMM, weighted-pool behavior, and stable-swap style trading with O(1) algebraic execution.
 
-### Core Mechanisms
+The protocol uses a Singleton one-token-one-pool architecture, protocol-native six-way fee routing, EIP-1153 transient locks, and X402-style intent execution with EIP-712 signatures.
 
-Zero Impermanent Loss (Zero IL) returns token amounts based on the historic principal recorded in `proof`, independent of the pool's current price.
+TTS tokenomics include price-doubling unlock mechanics and community-fee buyback-and-burn flows.
 
-Cross-token swaps are O(1) and complete in two steps via `buyGoodInput -> buyGoodOutput` (or `payGoodOutput -> payGoodInput`).
+## 🚀 Getting Started
 
-Assets are addressed by `T_GoodKey` under a single `TTSwap_Market` state, enabling Singleton one-token-one-pool.
+Any contribution is appreciated - jump in anytime ⚡
 
-Protocol-native six-way fee split distributes fees to LP / Operator / Gate / Referral / Customer / Platform, with `checkGoodConfig` enforcing a 100% sum.
+Under the 4C token allocation model, contributors may qualify for airdrop rewards, and top contributors may be invited to join the project team.[Detail](https://docs.ttswap.io/documentation/Community/Overview)
 
-EIP-1153 transient storage uses `L_Transient` to guard reentrancy and defines a transient lock boundary for `multicall`.
+If you are new, start with the repositories below:
 
-X402 separates signing from execution so `buyGood` / `payGood` can verify EIP-712 and an Executor can pay gas for a fixed `executeFee`.
+- `ttswap-core` - core protocol contracts and market/token logic
+- `ttswap-doc` - technical whitepapers and protocol documentation
+- `ttswap-subgraph` - indexing and analytics data layer
+- `ttswap-frontend` - ttswap UI,
 
-TTS uses a price-doubling unlock mechanism and community treasury fees are used for 100% buyback-and-burn.
+For protocol understanding, start with:
 
----
+- Whitepaper: `ttswap-doc/index/v2相关文档/whitepaper.md`
+- Core entrypoints: `TTSwap_Market_Proxy` / `TTSwap_Token_Proxy`
 
-### Entry Points & Docs
+## 🔗 Additional Resources
 
-Think of TTSWAP as a supermarket checkout desk where each asset maps to its shelf (one good = one pool state).
+Useful links are listed below:
 
-The whitepaper is at `ttswap-doc/index/v2相关文档/whitepaper.md`; core entrypoints are `TTSwap_Market_Proxy` / `TTSwap_Token_Proxy`.
-
----
-
-### Typical Use Cases
-
-Launchpad / IDO: `initGood` + `investGood` + `isPromised` + `refreshPromise`.
-
-Single-sided zero-IL market making: `investGood` + `disinvestProof`.
-
-Cross-token swap / payment: `buyGood` / `payGood`.
-
-Aggregation & operations commission: six-way fee split + `setReferral`.
-
-Roadmap: future activation of `T_GoodKey(ercType=2)` for tokenized equities and `T_GoodKey(ercType=3)` for prediction-market outcome shares.
-
----
-
-### Contacts
-
-| | |
-|---|---|
-| Twitter | [@ttswapfinance](https://x.com/ttswapfinance) |
-| Telegram | [@ttswapfinance](https://t.me/ttswapfinance) |
-| Discord | [ttswap](https://discord.gg/XygqnmQgX3) |
-| Email | [bussiness@ttswap.io](mailto:bussiness@ttswap.io) |
-| Website | [ttswap.io](https://ttswap.io) |
-| GitHub | [github.com/ttswap](https://github.com/ttswap) |
+- Whitepaper:[en](https://docs.ttswap.io/docs/whitepaper_en.pdf)[cn](https://docs.ttswap.io/docs/whitepaper.pdf)
+- Website: [ttswap.io](https://ttswap.io)
+- Document: [Document](https://docs.ttswap.io)
+- Twitter: [@ttswapfinance](https://x.com/ttswapfinance)
+- Telegram: [@ttswapfinance](https://t.me/ttswapfinance)
+- Discord: [ttswap](https://discord.gg/XygqnmQgX3)
+- Email: [bussiness@ttswap.io](mailto:bussiness@ttswap.io)
+- GitHub: [github.com/ttswap](https://github.com/ttswap)
