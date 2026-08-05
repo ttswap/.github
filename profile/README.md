@@ -37,7 +37,7 @@ For protocol understanding, start with:
 
 Useful links are listed below:
 
-- Whitepaper:[en](https://docs.ttswap.io/docs/whitepaper_en.pdf)[cn](https://docs.ttswap.io/docs/whitepaper.pdf)
+- Whitepaper:[en](https://docs.ttswap.io/docs/whitepaper_en.pdf)  |  [cn](https://docs.ttswap.io/docs/whitepaper.pdf)
 - Website: [ttswap.io](https://ttswap.io)
 - Document: [Document](https://docs.ttswap.io)
 - Twitter: [@ttswapfinance](https://x.com/ttswapfinance)
