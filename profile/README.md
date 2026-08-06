@@ -1,5 +1,7 @@
 ## Hey hey, welcome to the TTSWAP GitHub 🔨
 
+![截图](./TTSWAP_DeFi_Supermarket_Architecture_Overview.png)
+
 The TTSWAP GitHub is where contributors build a wider on-chain liquidity and payment ecosystem together 🌍  
 We are an open-source-first community and we welcome contributions, feature requests, issues, and pull requests 💡
 
