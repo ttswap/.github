@@ -2,7 +2,6 @@
   <strong>English</strong> | <a href="./README_CN.md">简体中文</a>
 </p>
 
-# TTSwap V2 — The DeFi Supermarket
 
 <p align="center">
   <img src="./TTSWAP_DeFi_Supermarket_Architecture_Overview.png" alt="TTSwap V2: independent asset shelves connected through Public Value inside a singleton market, with funded normal goods and collateral-plus-debt value goods" width="100%" />

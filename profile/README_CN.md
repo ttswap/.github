@@ -2,8 +2,6 @@
   <a href="./README.md">English</a> | <strong>简体中文</strong>
 </p>
 
-# TTSwap V2 — DeFi 去中心化超市
-
 <p align="center">
   <img src="./TTSWAP_DeFi_Supermarket_Architecture_Overview_CN.png" alt="TTSwap V2 架构：独立资产货架通过公共 Value 在单例市场中互联，普通商品采用实缴仓，价值商品采用抵押加负债仓" width="100%" />
 </p>
@@ -40,13 +38,13 @@ Value 是内部记账单位。在 `swapGoods` 中，中间 Value 数量直接在
 
 商品类型唯一决定仓位的记账模型：
 
-| | 普通商品（Normal Goods） | 价值商品（Value Goods） |
-| :--- | :--- | :--- |
-| 创建权限 | 无许可创建 | 需经 `MarketAdmin` 许可 |
-| 仓位模型 | 实缴仓（Funded） | 抵押 + Value 负债（Collateral + Debt） |
-| 创世注资 | 在初始现价上方区间纯代币注资 | 在初始现价下方区间纯代币抵押 |
-| 交易过程 | 买入将代币库存转为 Value 权益；卖出执行相反过程 | 卖入代币铸造 Value 并增加 LP 负债；买回代币销毁 Value 并减少负债 |
-| LP 撤资 | 按退出时的现价返还代币与/或 Value，并结算累计手续费 | 返还抵押与已吸收代币，须在同一会话内偿还仓位的 Value 负债 |
+|          | 普通商品（Normal Goods）                            | 价值商品（Value Goods）                                          |
+| :------- | :-------------------------------------------------- | :--------------------------------------------------------------- |
+| 创建权限 | 无许可创建                                          | 需经 `MarketAdmin` 许可                                          |
+| 仓位模型 | 实缴仓（Funded）                                    | 抵押 + Value 负债（Collateral + Debt）                           |
+| 创世注资 | 在初始现价上方区间纯代币注资                        | 在初始现价下方区间纯代币抵押                                     |
+| 交易过程 | 买入将代币库存转为 Value 权益；卖出执行相反过程     | 卖入代币铸造 Value 并增加 LP 负债；买回代币销毁 Value 并减少负债 |
+| LP 撤资  | 按退出时的现价返还代币与/或 Value，并结算累计手续费 | 返还抵押与已吸收代币，须在同一会话内偿还仓位的 Value 负债        |
 
 对于**普通商品**，LP 区间相对现价的位置决定注资构成：
 
@@ -58,13 +56,13 @@ Value 是内部记账单位。在 `swapGoods` 中，中间 Value 数量直接在
 
 ## 协议核心组件
 
-| 组件 | 作用 |
-| :--- | :--- |
-| **对数积分定价** | 在固定流动性分段内，虚拟价值尺度保持恒定：`p = C_V / C_Q`。卖出采用对数积分，买入采用其指数逆运算，并执行保守舍入。虚拟储备与金库的实际资产余额相互区分。 |
-| **区间组织** | 每个货架使用几何价格阶梯 Tier 与按 Zone 对齐的 LP 边界；穿越已初始化的流动性边界时，更新活跃曲线。 |
-| **会话记账** | `unlock` / `unlockFor` 通过 EIP-1153 暂态存储追踪净额差异；会话退出前，所有未结差额必须全部平账。 |
-| **统一托管与收据** | 市场支持 ERC-20、原生 ETH、ERC-1155 和 ERC-6909 资产，内建 ERC-6909 收据账本及直接存取通道。转账扣税代币必须使用 Push & Sync 结算；不支持弹性余额代币。 |
-| **费率与扩展** | 穿越已初始化边界时采用递增费率；各货架可配置分佣、双向 Hook，以及可选的 Tier 几何均价 TWAP / 已实现方差预言机。 |
+| 组件               | 作用                                                                                                                                                      |
+| :----------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **对数积分定价**   | 在固定流动性分段内，虚拟价值尺度保持恒定：`p = C_V / C_Q`。卖出采用对数积分，买入采用其指数逆运算，并执行保守舍入。虚拟储备与金库的实际资产余额相互区分。 |
+| **区间组织**       | 每个货架使用几何价格阶梯 Tier 与按 Zone 对齐的 LP 边界；穿越已初始化的流动性边界时，更新活跃曲线。                                                        |
+| **会话记账**       | `unlock` / `unlockFor` 通过 EIP-1153 暂态存储追踪净额差异；会话退出前，所有未结差额必须全部平账。                                                         |
+| **统一托管与收据** | 市场支持 ERC-20、原生 ETH、ERC-1155 和 ERC-6909 资产，内建 ERC-6909 收据账本及直接存取通道。转账扣税代币必须使用 Push & Sync 结算；不支持弹性余额代币。   |
+| **费率与扩展**     | 穿越已初始化边界时采用递增费率；各货架可配置分佣、双向 Hook，以及可选的 Tier 几何均价 TWAP / 已实现方差预言机。                                           |
 
 ## 实现状态与限制
 
@@ -78,15 +76,15 @@ Value 是内部记账单位。在 `swapGoods` 中，中间 Value 数量直接在
 
 ## V2 仓库导航
 
-| 仓库 | 主要内容 |
-| :--- | :--- |
-| [v2-ttswap-core](https://github.com/ttswap/v2-ttswap-core) | Solidity 市场、对数数学、货架、网关、收据账本及 Foundry 测试 |
-| [v2-ttswap-frontend](https://github.com/ttswap/v2-ttswap-frontend) | 兑换与流动性操作界面 |
-| [v2-ttswap-indexer](https://github.com/ttswap/v2-ttswap-indexer) | Rust 事件索引与查询服务 |
-| [v2-ttswap-subgraph](https://github.com/ttswap/v2-ttswap-subgraph) | 基于 The Graph 的事件索引与分析 |
-| [v2-ttswap-doc](https://github.com/ttswap/v2-ttswap-doc) | 技术文档与协议说明 |
-| [v2-ttswap-security](https://github.com/ttswap/v2-ttswap-security) | 安全研究、威胁模型与验证规范 |
-| [v2-ttswap-marketing](https://github.com/ttswap/v2-ttswap-marketing) | 品牌素材、研究与社区资料 |
+| 仓库                                                                 | 主要内容                                                     |
+| :------------------------------------------------------------------- | :----------------------------------------------------------- |
+| [v2-ttswap-core](https://github.com/ttswap/v2-ttswap-core)           | Solidity 市场、对数数学、货架、网关、收据账本及 Foundry 测试 |
+| [v2-ttswap-frontend](https://github.com/ttswap/v2-ttswap-frontend)   | 兑换与流动性操作界面                                         |
+| [v2-ttswap-indexer](https://github.com/ttswap/v2-ttswap-indexer)     | Rust 事件索引与查询服务                                      |
+| [v2-ttswap-subgraph](https://github.com/ttswap/v2-ttswap-subgraph)   | 基于 The Graph 的事件索引与分析                              |
+| [v2-ttswap-doc](https://github.com/ttswap/v2-ttswap-doc)             | 技术文档与协议说明                                           |
+| [v2-ttswap-security](https://github.com/ttswap/v2-ttswap-security)   | 安全研究、威胁模型与验证规范                                 |
+| [v2-ttswap-marketing](https://github.com/ttswap/v2-ttswap-marketing) | 品牌素材、研究与社区资料                                     |
 
 ## 参与贡献与安全报告
 
