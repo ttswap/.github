@@ -1,121 +1,118 @@
-# Welcome to the TTSwap GitHub Organization 🚀
+<p align="right">
+  <strong>English</strong> | <a href="./README_CN.md">简体中文</a>
+</p>
+
+# TTSwap V2 — The DeFi Supermarket
 
 <p align="center">
-  <img src="./TTSWAP_DeFi_Supermarket_Architecture_Overview.png" alt="TTSwap V2 DeFi Supermarket Architecture" width="100%" />
+  <img src="./TTSWAP_DeFi_Supermarket_Architecture_Overview.png" alt="TTSwap V2: independent asset shelves connected through Public Value inside a singleton market, with funded normal goods and collateral-plus-debt value goods" width="100%" />
 </p>
 
 <p align="center">
-  <strong>The Next-Generation Constant Value AMM (CV-AMM) & Single-Sided Liquidity Architecture</strong>
+  <strong>One asset, one range shelf. A shared Value settlement layer.</strong>
 </p>
 
 <p align="center">
-  <a href="https://ttswap.io"><img src="https://img.shields.io/badge/Website-ttswap.io-blue?style=flat-square&logo=googlechrome" alt="Website"></a>
-  <a href="https://docs.ttswap.io"><img src="https://img.shields.io/badge/Docs-docs.ttswap.io-blueviolet?style=flat-square&logo=docusaurus" alt="Docs"></a>
-  <a href="https://twitter.com/ttswapfinance"><img src="https://img.shields.io/badge/Twitter-@ttswapfinance-1DA1F2?style=flat-square&logo=twitter" alt="Twitter"></a>
-  <a href="https://discord.gg/XygqnmQgX3"><img src="https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=flat-square&logo=discord" alt="Discord"></a>
-  <a href="https://github.com/ttswap"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License"></a>
+  <a href="https://ttswap.io">Website</a> ·
+  <a href="https://docs.ttswap.io">Documentation</a> ·
+  <a href="https://github.com/ttswap/v2-ttswap-core/blob/master/doc/whitepaper.md">Technical whitepaper</a> ·
+  <a href="https://discord.gg/XygqnmQgX3">Discord</a> ·
+  <a href="https://twitter.com/ttswapfinance">X / Twitter</a>
 </p>
 
----
+## About TTSwap V2
 
-## 💡 About TTSwap V2
+**TTSwap V2** is a decentralized exchange protocol designed around **single-token range shelves** and a **constant-value logarithmic pricing kernel**. Each registered asset has an independent shelf inside one `TTSwapV2Market`, which also provides shared custody and settlement.
 
-**TTSwap V2** is a revolutionary decentralized exchange (DEX) protocol built on EVM-compatible networks. By departing from the conventional, fragmented "paired token pool" paradigm ($O(N^2)$ liquidity routing friction), TTSwap introduces the **Constant Value Automated Market Maker (CV-AMM)**. 
+Instead of maintaining every possible asset pair, **N assets use N shelves**. A swap sells asset A for the protocol's **Public Value** accounting unit, then spends that Value to buy asset B in the same atomic session:
 
-In TTSwap V2, every digital asset operates on its own **Single-Sided Range Shelf**, linked directly to a protocol-wide invariant virtual measure ($\Delta V$). This reduces systemic trading and market-making complexity across $N$ arbitrary assets to $O(N)$.
-
-```mermaid
-flowchart LR
-    subgraph Traditional["Traditional AMM (Fragmented Pairs)"]
-        direction TB
-        P1["Token A / ETH Pool"]
-        P2["Token B / ETH Pool"]
-        P3["Token A / USDT Pool"]
-        P1 -.->|"High Route Slippage"| P2
-    end
-
-    subgraph TTSwapV2["TTSwap V2 (Unified Shelf Topology)"]
-        direction TB
-        S1["Shelf A (Single-Sided)"]
-        S2["Shelf B (Single-Sided)"]
-        S3["Shelf ETH (Single-Sided)"]
-        S1 <==>|"Shared Internal Measure (ΔV)"| S2
-        S2 <==>|"Zero Pair Friction"| S3
-    end
+```text
+Asset A → Shelf A → Public Value → Shelf B → Asset B
+          sell                      buy
+         └──────── one atomic session ────────┘
 ```
 
----
+Value is an internal unit of account. In `swapGoods`, the intermediate amount passes directly between the two pricing legs without an external intermediate-token transfer. It can also be represented by an ERC-6909 receipt (`id = 0`) for use across transactions. The **O(N)** improvement describes shelf topology; execution cost still depends on liquidity boundaries, hooks, and settlement operations.
 
-## ⚡ Core Protocol Innovations
+This overview follows [whitepaper v2.2, dated 2026-11-22](https://github.com/ttswap/v2-ttswap-core/blob/master/doc/whitepaper.md), based on core commit [`97eb7aa`](https://github.com/ttswap/v2-ttswap-core/commit/97eb7aa34e035460ae79b62035afc0c304b366ec).
 
-### 1. Pure Single-Sided Liquidity Provisioning
-Liquidity providers deposit only the specific token they wish to hold. Market makers are completely freed from forced exposure to volatile counter-assets and paired impermanent loss (IL). Normal goods function as physical inventories, while value goods operate as collateralized debt positions.
+## How liquidity works
 
-### 2. Logarithmic Integral Pricing Curves
-Swapping asset $A$ into asset $B$ executes via a deterministic two-leg definite integral calculation:
+The accounting model is determined by the good's type:
 
-$$\Delta V = V_A \cdot \ln\left(\frac{Q_A + x}{Q_A}\right)$$
-
-$$y = Q_B \cdot \left(1 - \exp\left(-\frac{\Delta V}{V_B}\right)\right)$$
-
-This mathematical formulation bounds price impact smoothly and convexly across wide depth zones, preventing zero-cost sandwich manipulation.
-
-### 3. EIP-1153 Transient Accounting Sessions
-Multi-hop trades and combined invest/divest operations execute within an ephemeral flash-accounting session (`unlock` / `unlockFor`). Net token settlements occur only once at the conclusion of the transaction (`nonzeroDeltaCount == 0`), drastically cutting EVM gas overhead.
-
-### 4. Dual-Track Invariant Solvency
-Collateralized debt positions are governed by continuous solvency monitoring and dual-track liquidations, formally proven via symbolic execution and automated property invariants.
-
----
-
-## 📦 V2 Repository Ecosystem
-
-The TTSwap codebase is modularized across specialized sub-repositories. All new protocol development, audits, and feature requests center around the **V2 stack**:
-
-| Repository | Description | Primary Technology |
+| | Normal goods | Value goods |
 | :--- | :--- | :--- |
-| [**`v2-ttswap-core`**](https://github.com/ttswap/v2-ttswap-core) | CV-AMM core settlement hub, single-token shelves, EIP-1153 vault & liquidation engine | Solidity `0.8.29` / `0.8.37`, Foundry |
-| [**`v2-ttswap-frontend`**](https://github.com/ttswap/v2-ttswap-frontend) | Web3 terminal for single-sided LPing, token swaps, and real-time lightweight charting | React 19, Wagmi v2, Viem, Tailwind CSS |
-| [**`v2-ttswap-indexer`**](https://github.com/ttswap/v2-ttswap-indexer) | Ultra-high-throughput chain event ingestion and GraphQL API server | Rust 2021, Alloy 0.8, Tokio, Axum, PostgreSQL |
-| [**`v2-ttswap-subgraph`**](https://github.com/ttswap/v2-ttswap-subgraph) | Decentralized event indexing and TWL (Time-Weighted Liquidity) analytical pipeline | AssemblyScript, The Graph Protocol |
-| [**`v2-ttswap-doc`**](https://github.com/ttswap/v2-ttswap-doc) | Official bilingual documentation portal, mathematical whitepapers, and SDL specs | Docusaurus, TypeScript, KaTeX |
-| [**`v2-ttswap-security`**](https://github.com/ttswap/v2-ttswap-security) | Threat modeling, Certora CVL formal verification, Halmos symbolic proofs, and bounty specs | Certora, Halmos, Echidna, Foundry |
-| [**`v2-ttswap-marketing`**](https://github.com/ttswap/v2-ttswap-marketing) | Brand design guidelines, media assets, DEX benchmarking research, and partnership decks | Vector SVG, Python Benchmarks |
+| Creation | Permissionless | `MarketAdmin` permission required |
+| Position model | Funded | Collateral + Value debt |
+| Genesis | Token-only range above the initial spot price | Token-only collateral range below the initial spot price |
+| Trading | Buys convert token inventory into Value; sells reverse that process | Selling tokens mints Value and adds LP debt; buying tokens burns Value and reduces debt |
+| LP exit | Returns tokens and/or Value according to the exit price, with accrued fees settled | Returns collateral and absorbed tokens; the position's Value debt must be repaid in the same session |
 
-> [!NOTE]
-> **V1 Legacy Repositories**: The original V1 repositories (`ttswap-core`, `ttswap-frontend`, `ttswap-subgraph`) are permanently paused and no longer accept PRs. All contributors should direct their efforts exclusively to the `v2-*` repositories listed above.
+For **normal goods**, the LP's range determines the required funding:
 
----
+- **Above spot:** tokens only — a range sell order.
+- **Across spot:** tokens + Value — two-sided liquidity.
+- **Below spot:** Value only — a range buy order.
 
-## 🛡️ Bug Bounty & Retroactive Contributions
+Issuers can launch an normal-good shelf with token inventory alone, without paired stablecoin reserves. For value-good LPs, the main gateway's `divestAndRepay` can sell part of the withdrawn tokens to raise Value for repayment within one transaction, subject to available liquidity and protocol limits.
 
-TTSwap operates an open, transparent, and merit-based contribution tracking system.
+## Protocol building blocks
 
-1. **Quantified Contribution Scoring**: Every merged PR across our repositories is assigned a verifiable contribution score based on technical difficulty ($T_1 \sim T_4$) and repository domain weights:
-   $$\text{Final Score} = \text{Base Points} \times \text{Topic Weight} \times \text{Risk Multiplier}$$
-2. **EVM Wallet Binding**: Contributors must provide their EVM wallet address in PR submissions. Approved contributions are permanently recorded in each repository's `CONTRIBUTIONS.md`.
-3. **Retroactive Airdrop & Revenue Sharing**: Confirmed contribution points serve as the official allocation ledger for retroactive token airdrops and protocol revenue distributions upon TGE or dividend events.
-4. **Responsible Vulnerability Disclosure**: Security researchers uncovering smart contract vulnerabilities or mathematical solvency exploits are rewarded via our dedicated Bug Bounty Program. For sensitive reports, contact `security@ttswap.io`.
+| Component | Role |
+| :--- | :--- |
+| **Logarithmic pricing** | Within each fixed-liquidity segment, the virtual value scale is constant: `p = C_V / C_Q`. Selling integrates the curve with a logarithm; buying uses its exponential inverse, with conservative rounding. Virtual reserves are distinct from physical vault balances. |
+| **Range organization** | Each shelf uses geometric price Tiers and Zone-aligned LP boundaries. Crossing initialized liquidity boundaries updates the active curve. |
+| **Session accounting** | `unlock` / `unlockFor` use EIP-1153 transient storage to track net deltas. Every outstanding delta must be cleared before the session exits. |
+| **Unified custody and receipts** | The market supports ERC-20, native ETH, ERC-1155, and ERC-6909 assets, with an ERC-6909 receipt ledger and direct deposit/withdraw paths. Fee-on-transfer tokens require Push & Sync settlement; rebasing tokens are unsupported. |
+| **Fees and extensions** | Progressive fees apply across initialized boundaries. Configurable commissions, bidirectional hooks, and an optional Tier-based geometric TWAP / realized-variance oracle extend each shelf. |
 
----
+## Implementation status and limits
 
-## 🌐 简体中文概览 (Chinese Summary)
+The whitepaper records **502 passing tests across 84 suites**, including its research verification suite, at the referenced baseline. These results do not establish complete formal verification: long-running mixed-operation stateful invariants and multi-value-good depeg stress simulations remain coverage gaps, and Halmos tests require a separate run.
 
-**TTSwap V2** 是首个在 EVM 链上落地的“恒定价值做市商（CV-AMM）”去中心化交易所：
-- **纯单币做市**：用户无需被动组对，向单一资产货架存入代币即可开始赚取手续费，杜绝传统双币做市的无常损失；
-- **全资产互联**：$N$ 个代币仅需 $N$ 个货架，跨货架兑换通过公共价值度量（$\Delta V$）秒级结算，彻底消除池子割裂；
-- **极速高性能技术栈**：核心智能合约全面应用 EIP-1153 瞬时借贷；链下采用 Rust + Alloy 自研毫秒级索引器与 The Graph 双轨索引；
-- **开源贡献激励**：V1 项目已全线归档并暂停维护，所有开发集中于 `v2-*` 系列。欢迎社区提交 PR 并绑定 EVM 钱包，所有有效贡献均将永久记账并在项目发币或分红时享受追溯空投分配。
+Before deployment or integration, review [the whitepaper's implementation limits and validation status](https://github.com/ttswap/v2-ttswap-core/blob/master/doc/whitepaper.md), including:
 
----
+- **Deployment size:** at that baseline, Market runtime bytecode is 59,252 bytes and Previewer is 26,192 bytes, both above the standard EIP-170 limit of 24,576 bytes. Deployment under that limit requires further contract restructuring.
+- **Liquidity and debt risks:** range positions retain inventory exposure; value-good depegs can transmit risk through shared Value. Exit liquidity, debt repayment, and the minimum active-liquidity requirement constrain the last active LP's withdrawal.
+- **Fee and oracle scope:** progressive-fee depth persists within one transaction, and resets across transactions even in the same block. Oracle observations are boundary-triggered and have no fixed heartbeat.
 
-## 🔗 Official Resources & Links
+## V2 repositories
 
-- 🌐 **Official Website**: [ttswap.io](https://ttswap.io)
-- 📚 **Technical Documentation**: [docs.ttswap.io](https://docs.ttswap.io)
-- 📄 **Whitepaper v2.2**: [Docusaurus Whitepaper Section](https://docs.ttswap.io/docs/whitepaper)
-- 🐦 **Twitter / X**: [@ttswapfinance](https://twitter.com/ttswapfinance)
-- 💬 **Discord**: [TTSwap Official Discord](https://discord.gg/XygqnmQgX3)
-- ✈️ **Telegram**: [@ttswapfinance](https://t.me/ttswapfinance)
-- 🔒 **Security Contact**: [security@ttswap.io](mailto:security@ttswap.io)
-- 💼 **Business Inquiries**: [bussiness@ttswap.io](mailto:bussiness@ttswap.io)
+| Repository | Focus |
+| :--- | :--- |
+| [v2-ttswap-core](https://github.com/ttswap/v2-ttswap-core) | Solidity market, logarithmic math, shelves, gateways, receipt ledger, and Foundry tests |
+| [v2-ttswap-frontend](https://github.com/ttswap/v2-ttswap-frontend) | Swap and liquidity interfaces |
+| [v2-ttswap-indexer](https://github.com/ttswap/v2-ttswap-indexer) | Rust event indexing and query services |
+| [v2-ttswap-subgraph](https://github.com/ttswap/v2-ttswap-subgraph) | The Graph event indexing and analytics |
+| [v2-ttswap-doc](https://github.com/ttswap/v2-ttswap-doc) | Documentation and protocol explainers |
+| [v2-ttswap-security](https://github.com/ttswap/v2-ttswap-security) | Security research, threat models, and verification specifications |
+| [v2-ttswap-marketing](https://github.com/ttswap/v2-ttswap-marketing) | Brand assets, research, and community materials |
+
+## Contributing and security
+
+Start with the relevant V2 repository and its contribution guide. The core guides are available in [English](https://github.com/ttswap/v2-ttswap-core/blob/master/CONTRIBUTING_EN.md) and [简体中文](https://github.com/ttswap/v2-ttswap-core/blob/master/CONTRIBUTING_CN.md).
+
+For contribution tracking, include your EVM wallet address in the PR template where required. Maintainers record approved contributions in the repository's `CONTRIBUTIONS.md`; scoring and retroactive incentive rules follow that repository's published guidelines.
+
+Report sensitive vulnerabilities privately to [security@ttswap.io](mailto:security@ttswap.io).
+
+## 简体中文概览
+
+**TTSwap V2** 以“单币区间货架 + 公共 Value 清算”组织交易市场：每种注册资产对应一个独立货架，共享单例市场的资产托管与结算设施，N 种资产只需 N 个货架。
+
+- **跨货架兑换**：同一原子会话内执行 `资产 A → Value → 资产 B`；Value 是内部记账单位，也可表示为 ERC-6909 `id = 0` 收据。
+- **普通商品实缴仓**：支持无许可创建；现价上方存代币、跨现价存代币与 Value、现价下方存 Value。发行方可仅用代币库存启动货架。
+- **价值商品负债仓**：由管理员许可创建，采用“抵押 + Value 负债”；卖入代币铸出 Value、买回代币销毁 Value，LP 撤资须在同一会话内偿债。
+- **会话净额结算**：EIP-1153 跟踪会话差额，退出前必须全部平账；统一金库支持四类资产标准，原生 ERC-6909 账本记录收据。
+- **实现边界**：本页依据白皮书 v2.2（2026-11-22、`97eb7aa`）。该基线的 Market 与 Previewer 字节码仍超标准 EIP-170 上限；LP 存在库存、脱锚传导与撤资偿债风险，跨区费率深度仅在单笔交易内累计。部署或集成前请阅读白皮书的限制与验证章节。
+
+## Official resources
+
+- **Website:** [ttswap.io](https://ttswap.io)
+- **Documentation:** [docs.ttswap.io](https://docs.ttswap.io)
+- **Whitepaper:** [Core technical whitepaper](https://github.com/ttswap/v2-ttswap-core/blob/master/doc/whitepaper.md)
+- **X / Twitter:** [@ttswapfinance](https://twitter.com/ttswapfinance)
+- **Discord:** [TTSwap community](https://discord.gg/XygqnmQgX3)
+- **Telegram:** [@ttswapfinance](https://t.me/ttswapfinance)
+- **Security:** [security@ttswap.io](mailto:security@ttswap.io)
+- **Business:** [bussiness@ttswap.io](mailto:bussiness@ttswap.io)
